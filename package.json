@@ -8,8 +8,8 @@
     "start": "webpack-dev-server",
     "eslint": "eslint src/**/*.js",
     "test": "npm run eslint && jest",
-    "build": "webpack --mode development",
-    "deploy": "gh-pages -d build"
+    "build": "webpack --mode production",
+    "deploy": "gh-pages -d public"
   },
   "author": "demikhovr",
   "dependencies": {
