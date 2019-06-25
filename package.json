@@ -1,7 +1,7 @@
 {
-  "name": "avito-test",
+  "name": "products-react",
   "version": "1.0.0",
-  "homepage": "https://demikhovr.github.io/avito-test",
+  "homepage": "https://demikhovr.github.io/products-react",
   "description": "",
   "main": "index.js",
   "scripts": {
