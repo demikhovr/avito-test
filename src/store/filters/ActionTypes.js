@@ -1,0 +1,1 @@
+export const CHANGE_FILTER_TYPE = 'CHANGE_FILTER_TYPE';
