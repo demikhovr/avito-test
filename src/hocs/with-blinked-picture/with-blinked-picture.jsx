@@ -6,8 +6,8 @@ import {
   INITIAL_PIC_INDEX,
 } from '../../constants';
 
-const withRandomActiveItem = (Component) => {
-  class WithRandomActiveItem extends React.Component {
+const withBlinkedPicture = (Component) => {
+  class WithBlinkedPicture extends React.Component {
     constructor(props) {
       super(props);
 
@@ -15,8 +15,10 @@ const withRandomActiveItem = (Component) => {
         lastActiveIndex: INITIAL_PIC_INDEX,
       };
 
+      this._timerId = null;
+
       this._getRandomIndex = this._getRandomIndex.bind(this);
-      this._onResetActiveItem = this._onResetActiveItem.bind(this);
+      this._onResetBlinking = this._onResetBlinking.bind(this);
     }
 
     _getRandomIndex() {
@@ -31,9 +33,13 @@ const withRandomActiveItem = (Component) => {
       return randomIndex;
     }
 
-    _onResetActiveItem() {
+    _onResetBlinking() {
+      if (this._timerId) {
+        clearTimeout(this._timerId);
+      }
+
       const lastActiveIndex = this._getRandomIndex();
-      setTimeout(() => this.setState({ lastActiveIndex }), CHANGE_PIC_DELAY);
+      this._timerId = setTimeout(() => this.setState({ lastActiveIndex }), CHANGE_PIC_DELAY);
     }
 
     render() {
@@ -43,22 +49,22 @@ const withRandomActiveItem = (Component) => {
       return (
         <Component
           {...props}
-          activeIndex={lastActiveIndex}
-          onResetActiveItem={this._onResetActiveItem}
+          blinkedPicture={lastActiveIndex}
+          onResetBlinking={this._onResetBlinking}
         />
       );
     }
   }
 
-  WithRandomActiveItem.propTypes = {
+  WithBlinkedPicture.propTypes = {
     products: PropTypes.arrayOf(PropTypes.shape(Product)),
   };
 
-  WithRandomActiveItem.defaultProps = {
+  WithBlinkedPicture.defaultProps = {
     products: [],
   };
 
-  return WithRandomActiveItem;
+  return WithBlinkedPicture;
 };
 
-export default withRandomActiveItem;
+export default withBlinkedPicture;
