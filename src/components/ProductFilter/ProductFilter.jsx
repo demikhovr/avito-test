@@ -12,14 +12,18 @@ class ProductFilter extends React.Component {
 
   _onSubmit(evt) {
     evt.preventDefault();
-    const { formData } = this.props;
+    const {
+      formData,
+      onResetBlinking,
+    } = this.props;
     const { onChangeFilterType } = this.props;
     onChangeFilterType(formData['is-favorite'] ? 'isFavorite' : null);
+    onResetBlinking();
   }
 
   render() {
     const {
-      onChange,
+      onChange
     } = this.props;
 
     return (
@@ -78,6 +82,7 @@ ProductFilter.propTypes = {
     'is-favorite': PropTypes.bool,
   }),
   onChange: PropTypes.func.isRequired,
+  onResetBlinking: PropTypes.func.isRequired,
   onChangeFilterType: PropTypes.func.isRequired,
 };
 

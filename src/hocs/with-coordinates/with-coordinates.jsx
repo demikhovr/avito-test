@@ -15,6 +15,8 @@ const withCoordinates = (Component) => {
       this.state = {
         addressString: null,
       };
+
+      this._mounted = true;
     }
 
     componentDidMount() {
@@ -22,6 +24,10 @@ const withCoordinates = (Component) => {
 
       axios.get(`${GEOCODE_URL}&apikey=${GEOCODE_API_KEY}&geocode=${lng},${lat}`)
         .then((response) => {
+          if (!this._mounted) {
+            return;
+          }
+
           const { data } = response;
           const { GeoObject } = data.response.GeoObjectCollection.featureMember[0];
 
@@ -30,6 +36,10 @@ const withCoordinates = (Component) => {
           });
         })
         .catch(() => {});
+    }
+
+    componentWillUnmount() {
+      this._mounted = false;
     }
 
     render() {

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { compose } from 'recompose';
 
 import withFilteredItems from '../../hocs/with-filtered-items/with-filtered-items';
+import withBlinkedPicture from '../../hocs/with-blinked-picture/with-blinked-picture';
 
 import ProductList from '../ProductList/ProductList';
 import ProductFilter from '../ProductFilter/ProductFilter';
@@ -21,7 +22,9 @@ class App extends React.Component {
   render() {
     const {
       products,
+      blinkedPicture,
       onChangeFilterType,
+      onResetBlinking,
     } = this.props;
 
     return (
@@ -30,11 +33,14 @@ class App extends React.Component {
           <section className="layout-main products-list">
             <ProductList
               products={products}
+              blinkedPicture={blinkedPicture}
+              onResetBlinking={onResetBlinking}
             />
           </section>
           <aside className="layout-sidebar">
             <ProductFilter
               onChangeFilterType={onChangeFilterType}
+              onResetBlinking={onResetBlinking}
             />
           </aside>
         </main>
@@ -46,7 +52,9 @@ class App extends React.Component {
 App.propTypes = {
   products: PropTypes.arrayOf(PropTypes.shape(Product)),
   loadProducts: PropTypes.func.isRequired,
+  blinkedPicture: PropTypes.number.isRequired,
   onChangeFilterType: PropTypes.func.isRequired,
+  onResetBlinking: PropTypes.func.isRequired,
 };
 
 App.defaultProps = {
@@ -65,4 +73,5 @@ const mapDispatchToProps = dispatch => ({
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withFilteredItems,
+  withBlinkedPicture,
 )(App);

@@ -25,19 +25,23 @@ class Picture extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const prevActive = prevProps.isActive;
+    const prevBlinkingState = prevProps.hasBlinking;
     const {
       pictures,
-      isActive,
+      hasBlinking,
     } = this.props;
 
-    if (!isActive || prevActive === isActive) {
+    if (!hasBlinking || prevBlinkingState === hasBlinking) {
       return;
     }
 
     const index = this._getRandomSource();
     const picture = pictures[index];
     this._setImg(picture);
+  }
+
+  componentWillUnmount() {
+    this._imgRef.current.src = '';
   }
 
   _setImg(src) {
@@ -66,12 +70,12 @@ class Picture extends React.Component {
 
   _onLoad() {
     const {
-      isActive,
-      onResetActiveItem,
+      hasBlinking,
+      onResetBlinking,
     } = this.props;
 
-    if (isActive) {
-      onResetActiveItem();
+    if (hasBlinking) {
+      onResetBlinking();
     }
 
     this.setState({
@@ -97,8 +101,8 @@ class Picture extends React.Component {
 
 Picture.propTypes = {
   pictures: PropTypes.arrayOf(PropTypes.string),
-  isActive: PropTypes.bool.isRequired,
-  onResetActiveItem: PropTypes.func.isRequired,
+  hasBlinking: PropTypes.bool.isRequired,
+  onResetBlinking: PropTypes.func.isRequired,
 };
 
 Picture.defaultProps = {

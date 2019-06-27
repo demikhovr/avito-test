@@ -17,9 +17,9 @@ const ProductCard = (props) => {
     title,
     addressString,
     isFavorite,
-    isActive,
+    hasBlinking,
     onChangeFavorite,
-    onResetActiveItem,
+    onResetBlinking,
   } = props;
   const favoriteClass = isFavorite ? 'product-favorite--active' : '';
 
@@ -31,8 +31,8 @@ const ProductCard = (props) => {
         </a>
         <Picture
           pictures={pictures}
-          isActive={isActive}
-          onResetActiveItem={onResetActiveItem}
+          hasBlinking={hasBlinking}
+          onResetBlinking={onResetBlinking}
         />
       </div>
       <div className="product-description">
@@ -64,9 +64,9 @@ ProductCard.propTypes = {
   ...Product,
   addressString: PropTypes.string,
   isFavorite: PropTypes.bool.isRequired,
-  isActive: PropTypes.bool.isRequired,
+  hasBlinking: PropTypes.bool.isRequired,
   onChangeFavorite: PropTypes.func.isRequired,
-  onResetActiveItem: PropTypes.func.isRequired,
+  onResetBlinking: PropTypes.func.isRequired,
 };
 
 ProductCard.defaultProps = {
