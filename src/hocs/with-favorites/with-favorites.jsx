@@ -1,5 +1,4 @@
 import React from 'react';
-import { Product } from '../../types';
 
 const withFavorites = (Component) => {
   class WithFavorites extends React.Component {
@@ -7,25 +6,28 @@ const withFavorites = (Component) => {
       super(props);
 
       this.state = {
-        isFavorite: this._getFavorite(),
+        favorites: [],
       };
 
-      this._getFavorite = this._getFavorite.bind(this);
+      this._checkFavorite = this._checkFavorite.bind(this);
       this._onChangeFavorite = this._onChangeFavorite.bind(this);
     }
 
-    _getFavorite() {
-      const { id } = this.props;
+    componentDidMount() {
       const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+      this.setState({ favorites });
+    }
+
+    _checkFavorite(id) {
+      const { favorites } = this.state;
       return favorites.some(it => it === id);
     }
 
-    _onChangeFavorite() {
-      const { id } = this.props;
-      const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    _onChangeFavorite(id) {
+      const { favorites } = this.state;
       const index = favorites.findIndex(it => it === id);
-      const isFavorites = index !== -1;
-      const updatedFavorites = isFavorites
+      const inFavorites = index !== -1;
+      const updatedFavorites = inFavorites
         ? [...favorites.slice(0, index),
           ...favorites.slice(index + 1)]
         : [...favorites, id];
@@ -33,25 +35,24 @@ const withFavorites = (Component) => {
       localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
 
       this.setState({
-        isFavorite: !isFavorites,
+        favorites: updatedFavorites,
       });
     }
 
     render() {
-      const { isFavorite } = this.state;
+      const { favorites } = this.state;
       const { props } = this;
 
       return (
         <Component
           {...props}
-          isFavorite={isFavorite}
+          favorites={favorites}
+          checkFavorite={this._checkFavorite}
           onChangeFavorite={this._onChangeFavorite}
         />
       );
     }
   }
-
-  WithFavorites.propTypes = Product;
 
   return WithFavorites;
 };
