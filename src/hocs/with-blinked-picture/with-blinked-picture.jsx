@@ -36,6 +36,7 @@ const withBlinkedPicture = (Component) => {
     _onResetBlinking() {
       if (this._timerId) {
         clearTimeout(this._timerId);
+        this._timerId = null;
       }
 
       const lastActiveIndex = this._getRandomIndex();

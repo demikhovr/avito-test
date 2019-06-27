@@ -18,7 +18,7 @@ class ProductFilter extends React.Component {
     } = this.props;
     const { onChangeFilterType } = this.props;
     onChangeFilterType(formData['is-favorite'] ? 'isFavorite' : null);
-    onResetBlinking();
+    setTimeout(onResetBlinking);
   }
 
   render() {
