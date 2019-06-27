@@ -1,7 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
 
 import withFormData from '../../hocs/with-form-data/with-form-data';
+
+import FilterActionCreator from '../../store/filters/ActionCreator/ActionCreator';
 
 class ProductFilter extends React.Component {
   constructor(props) {
@@ -16,8 +20,8 @@ class ProductFilter extends React.Component {
       formData,
       onResetBlinking,
     } = this.props;
-    const { onChangeFilterType } = this.props;
-    onChangeFilterType(formData['is-favorite'] ? 'isFavorite' : null);
+    const { changeFilterType } = this.props;
+    changeFilterType(formData['is-favorite'] ? 'isFavorite' : null);
     setTimeout(onResetBlinking);
   }
 
@@ -83,11 +87,18 @@ ProductFilter.propTypes = {
   }),
   onChange: PropTypes.func.isRequired,
   onResetBlinking: PropTypes.func.isRequired,
-  onChangeFilterType: PropTypes.func.isRequired,
+  changeFilterType: PropTypes.func.isRequired,
 };
 
 ProductFilter.defaultProps = {
   formData: {},
 };
 
-export default withFormData(ProductFilter);
+const mapDispatchToProps = dispatch => ({
+  changeFilterType: type => dispatch(FilterActionCreator.changeFilterType(type))
+});
+
+export default compose(
+  withFormData,
+  connect(null, mapDispatchToProps),
+)(ProductFilter);

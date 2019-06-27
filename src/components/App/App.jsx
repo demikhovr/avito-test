@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { compose } from 'recompose';
 
-import withFilteredItems from '../../hocs/with-filtered-items/with-filtered-items';
 import withBlinkedPicture from '../../hocs/with-blinked-picture/with-blinked-picture';
 
 import ProductList from '../ProductList/ProductList';
@@ -23,7 +22,6 @@ class App extends React.Component {
     const {
       products,
       blinkedPicture,
-      onChangeFilterType,
       onResetBlinking,
     } = this.props;
 
@@ -39,7 +37,6 @@ class App extends React.Component {
           </section>
           <aside className="layout-sidebar">
             <ProductFilter
-              onChangeFilterType={onChangeFilterType}
               onResetBlinking={onResetBlinking}
             />
           </aside>
@@ -53,7 +50,6 @@ App.propTypes = {
   products: PropTypes.arrayOf(PropTypes.shape(Product)),
   loadProducts: PropTypes.func.isRequired,
   blinkedPicture: PropTypes.number.isRequired,
-  onChangeFilterType: PropTypes.func.isRequired,
   onResetBlinking: PropTypes.func.isRequired,
 };
 
@@ -72,6 +68,5 @@ const mapDispatchToProps = dispatch => ({
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
-  withFilteredItems,
   withBlinkedPicture,
 )(App);
