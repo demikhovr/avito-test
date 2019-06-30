@@ -13,12 +13,12 @@ export default {
     const inFavorites = index !== -1;
     const updatedFavorites = inFavorites
       ? [
-          ...favorites.slice(0, index),
-          ...favorites.slice(index + 1)
+        ...favorites.slice(0, index),
+        ...favorites.slice(index + 1),
       ]
       : [...favorites, id];
 
     localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
     dispatch(ActionCreator.loadFavorites(updatedFavorites));
-  }
+  },
 };

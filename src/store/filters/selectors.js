@@ -1,3 +1,3 @@
 import NameSpace from '../NameSpace';
 
-export const getFilterType = state => state[NameSpace.FILTERS].filterType;
+export const getFilters = state => state[NameSpace.FILTERS].filters;

@@ -1,10 +1,10 @@
 import {
-  CHANGE_FILTER_TYPE,
+  CHANGE_FILTERS,
 } from '../ActionTypes';
 
 export default {
-  changeFilterType: (type) => ({
-    type: CHANGE_FILTER_TYPE,
-    payload: type,
+  changeFilters: filters => ({
+    type: CHANGE_FILTERS,
+    payload: filters,
   }),
 };

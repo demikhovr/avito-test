@@ -1,17 +1,17 @@
 import {
-  CHANGE_FILTER_TYPE,
+  CHANGE_FILTERS,
 } from '../ActionTypes';
 
 const initialState = {
-  filterType: null,
+  filters: {},
 };
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case CHANGE_FILTER_TYPE: {
+    case CHANGE_FILTERS: {
       return {
         ...state,
-        filterType: action.payload,
+        filters: action.payload,
       };
     }
     default: {
