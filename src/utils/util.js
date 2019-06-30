@@ -19,4 +19,4 @@ export const getRandomIndex = (arr, lastIndex) => {
   }
 
   return randomIndex;
-}
+};

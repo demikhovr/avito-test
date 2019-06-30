@@ -1,3 +1,5 @@
+import { SortingType } from '../../constants';
+
 export const adaptProductData = data => ({
   address: data.address,
   bodyType: data.body_type,
@@ -10,3 +12,19 @@ export const adaptProductData = data => ({
   title: data.title,
   year: data.year,
 });
+
+export const makeSortFunction = category => (a, b) => {
+  if (category === SortingType.CHEAP_FIRST) {
+    return a.price - b.price;
+  }
+
+  if (category === SortingType.EXPENSIVE_FIRST) {
+    return b.price - a.price;
+  }
+
+  if (category === SortingType.POPULAR) {
+    return true;
+  }
+
+  return true;
+};
