@@ -1,12 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { compose } from 'recompose';
 
 import withCoordinates from '../../hocs/with-coordinates/with-coordinates';
 
 import Picture from '../Picture/Picture';
 
+import FavoritesOperation from '../../store/favorites/Operation/Operation';
 import { formatPrice } from '../../utils/util';
 import { Product } from '../../types';
+import { getFavorites } from '../../store/favorites/selectors';
 
 class ProductCard extends React.Component {
   constructor(props) {
@@ -20,20 +24,23 @@ class ProductCard extends React.Component {
       id,
       onChangeFavorite,
     } = this.props;
+
     onChangeFavorite(id);
   }
 
 
   render() {
     const {
+      index,
+      id,
+      products,
+      favorites,
+      addressString,
       pictures,
       price,
       title,
-      addressString,
-      isFavorite,
-      hasBlinking,
-      onResetBlinking,
     } = this.props;
+    const isFavorite = favorites.includes(id);
     const favoriteClass = isFavorite ? 'product-favorite--active' : '';
 
     return (
@@ -43,9 +50,9 @@ class ProductCard extends React.Component {
             {pictures.length}
           </a>
           <Picture
+            index={index}
             pictures={pictures}
-            hasBlinking={hasBlinking}
-            onResetBlinking={onResetBlinking}
+            products={products}
           />
         </div>
         <div className="product-description">
@@ -76,15 +83,27 @@ class ProductCard extends React.Component {
 
 ProductCard.propTypes = {
   ...Product,
+  index: PropTypes.number.isRequired,
+  products: PropTypes.arrayOf(PropTypes.shape(Product)),
+  favorites: PropTypes.arrayOf(PropTypes.string),
   addressString: PropTypes.string,
-  isFavorite: PropTypes.bool.isRequired,
-  hasBlinking: PropTypes.bool.isRequired,
   onChangeFavorite: PropTypes.func.isRequired,
-  onResetBlinking: PropTypes.func.isRequired,
 };
 
 ProductCard.defaultProps = {
   addressString: '',
 };
 
-export default withCoordinates(ProductCard);
+const mapStateToProps = (state, props) => ({
+  ...props,
+  favorites: getFavorites(state),
+});
+
+const mapDispatchToProps = dispatch => ({
+  onChangeFavorite: id => dispatch(FavoritesOperation.changeFavorite(id)),
+});
+
+export default compose(
+  connect(mapStateToProps, mapDispatchToProps),
+  withCoordinates
+)(ProductCard);

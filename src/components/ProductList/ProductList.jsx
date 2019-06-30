@@ -3,75 +3,65 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { compose } from 'recompose';
 
-import withFavorites from '../../hocs/with-favorites/with-favorites';
+import withFilters from '../../hocs/with-filters/with-filters';
 
 import ProductCard from '../ProductCard/ProductCard';
 
-import { getLoadingState } from '../../store/products/selectors';
+import {
+  getProducts,
+  getLoadingState,
+} from '../../store/products/selectors';
+import BlinkingActionCreator from '../../store/blinking/ActionCreator/ActionCreator';
 import { Product } from '../../types';
-import { getFilterType } from '../../store/filters/selectors';
+import { INITIAL_PIC_INDEX } from '../../constants';
 
-const ProductList = (props) => {
-  const {
-    isLoading,
-    products,
-    favorites,
-    blinkedPicture,
-    filterType,
-    checkFavorite,
-    onChangeFavorite,
-    onResetBlinking,
-  } = props;
+class ProductList extends React.Component {
+  componentDidUpdate() {
+    const { changeBlinkingProductIndex } = this.props;
+    changeBlinkingProductIndex(INITIAL_PIC_INDEX);
+  }
 
-  return isLoading
-    ? <div>Loading</div>
-    : products.map((it, i) => {
-      const isFilterByFavorite = filterType === 'isFavorite';
-      const isFavorite = checkFavorite(it.id);
-      const inFavorites = favorites.includes(it.id);
+  render() {
+    const {
+      isLoading,
+      products,
+    } = this.props;
 
-      if (isFilterByFavorite && (!isFavorite || !inFavorites)) {
-        return null;
-      }
-
-
-      return (
+    return isLoading
+      ? <div>Loading</div>
+      : products.map((it, index) => (
         <ProductCard
           key={it.id}
           {...it}
-          isFavorite={isFavorite}
-          onChangeFavorite={onChangeFavorite}
-          hasBlinking={blinkedPicture === i}
-          onResetBlinking={onResetBlinking}
+          index={index}
+          products={products}
         />
-      );
-    });
+      ));
+  }
 };
 
 ProductList.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   products: PropTypes.arrayOf(PropTypes.shape(Product)),
-  favorites: PropTypes.arrayOf(PropTypes.string),
-  blinkedPicture: PropTypes.number.isRequired,
-  filterType: PropTypes.string,
-  checkFavorite: PropTypes.func.isRequired,
-  onChangeFavorite: PropTypes.func.isRequired,
-  onResetBlinking: PropTypes.func.isRequired,
+  changeBlinkingProductIndex: PropTypes.func.isRequired,
 };
 
 ProductList.defaultProps = {
   products: [],
   favorites: [],
-  filterType: null,
 };
 
 const mapStateToProps = (state, props) => ({
   ...props,
   isLoading: getLoadingState(state),
-  filterType: getFilterType(state),
+  products: getProducts(state),
+});
+
+const mapDispatchToProps = dispatch => ({
+  changeBlinkingProductIndex: index => dispatch(BlinkingActionCreator.changeIndex(index)),
 });
 
 export default compose(
-  connect(mapStateToProps),
-  withFavorites
+  connect(mapStateToProps, mapDispatchToProps),
+  withFilters,
 )(ProductList);

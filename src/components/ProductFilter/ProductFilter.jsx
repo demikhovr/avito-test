@@ -6,6 +6,7 @@ import { compose } from 'redux';
 import withFormData from '../../hocs/with-form-data/with-form-data';
 
 import FilterActionCreator from '../../store/filters/ActionCreator/ActionCreator';
+import { getLoadingState } from '../../store/products/selectors';
 
 class ProductFilter extends React.Component {
   constructor(props) {
@@ -16,19 +17,18 @@ class ProductFilter extends React.Component {
 
   _onSubmit(evt) {
     evt.preventDefault();
-    const {
-      formData,
-      onResetBlinking,
-    } = this.props;
+    const { formData } = this.props;
     const { changeFilterType } = this.props;
     changeFilterType(formData['is-favorite'] ? 'isFavorite' : null);
-    setTimeout(onResetBlinking);
   }
 
   render() {
     const {
-      onChange
+      isLoading,
+      onChange,
     } = this.props;
+
+    const disabled = isLoading ? 'disabled' : '';
 
     return (
       <form
@@ -36,12 +36,12 @@ class ProductFilter extends React.Component {
         onSubmit={this._onSubmit}
         onChange={onChange}
       >
-        <fieldset className="products-filter-group radiogroup products-filter-favorite">
+        <fieldset className="products-filter-group radiogroup products-filter-favorite" disabled={disabled}>
           <input type="checkbox" name="is-favorite" id="favorite" />
           <label className="radiogroup-item" htmlFor="favorite">Показывать избранные</label>
         </fieldset>
 
-        <fieldset className="products-filter-group" disabled>
+        <fieldset className="products-filter-group" disabled={disabled}>
           <label htmlFor="category">Категория</label>
           <br />
 
@@ -54,7 +54,7 @@ class ProductFilter extends React.Component {
           </select>
         </fieldset>
 
-        <fieldset className="products-filter-group radiogroup" disabled>
+        <fieldset className="products-filter-group radiogroup" disabled={disabled}>
           Сначала:
 
           <input type="radio" name="sort" value="popular" id="sort-popular" checked />
@@ -67,7 +67,7 @@ class ProductFilter extends React.Component {
           <label className="radiogroup-item" htmlFor="sort-expensive">дорогие</label>
         </fieldset>
 
-        <fieldset className="products-filter-group" disabled>
+        <fieldset className="products-filter-group" disabled={disabled}>
           <label htmlFor="price-range">Максимальная цена</label>
           <br />
           <span className="price-range-min">1000</span>
@@ -86,7 +86,6 @@ ProductFilter.propTypes = {
     'is-favorite': PropTypes.bool,
   }),
   onChange: PropTypes.func.isRequired,
-  onResetBlinking: PropTypes.func.isRequired,
   changeFilterType: PropTypes.func.isRequired,
 };
 
@@ -94,11 +93,16 @@ ProductFilter.defaultProps = {
   formData: {},
 };
 
+const mapStateToProps = (state, props) => ({
+  ...props,
+  isLoading: getLoadingState(state),
+});
+
 const mapDispatchToProps = dispatch => ({
   changeFilterType: type => dispatch(FilterActionCreator.changeFilterType(type))
 });
 
 export default compose(
+  connect(mapStateToProps, mapDispatchToProps),
   withFormData,
-  connect(null, mapDispatchToProps),
 )(ProductFilter);

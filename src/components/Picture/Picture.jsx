@@ -1,5 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { Product } from '../../types';
+import BlinkingActionCreator from '../../store/blinking/ActionCreator/ActionCreator';
+import { getBlinkingIndex } from '../../store/blinking/selectors';
+import { getRandomIndex } from '../../utils/util';
 
 class Picture extends React.Component {
   constructor(props) {
@@ -10,10 +15,10 @@ class Picture extends React.Component {
       lastIndex: 0,
     };
 
+    this._timerId = null;
     this._imgRef = React.createRef();
 
     this._setImg = this._setImg.bind(this);
-    this._getRandomSource = this._getRandomSource.bind(this);
     this._onLoad = this._onLoad.bind(this);
   }
 
@@ -25,23 +30,42 @@ class Picture extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const prevBlinkingState = prevProps.hasBlinking;
+    const prevBlinkingId = prevProps.blinkingIndex;
     const {
-      pictures,
-      hasBlinking,
+      index,
+      products,
+      blinkingIndex,
+      changeBlinkingProductIndex,
     } = this.props;
 
-    if (!hasBlinking || prevBlinkingState === hasBlinking) {
+    if (products.length === 1) {
+      const updatedIndex = getRandomIndex(products, index);
+      this._timerId = setTimeout(() => changeBlinkingProductIndex(updatedIndex), 3000);
+    }
+
+    if (blinkingIndex !== index || prevBlinkingId === blinkingIndex) {
       return;
     }
 
-    const index = this._getRandomSource();
-    const picture = pictures[index];
-    this._setImg(picture);
+    this._updateImg();
   }
 
   componentWillUnmount() {
     this._imgRef.current.src = '';
+    clearTimeout(this._timerId);
+  }
+
+  _updateImg() {
+    const { lastIndex } = this.state;
+    const { pictures } = this.props;
+    const currentIndex = getRandomIndex(pictures, lastIndex);
+    const picture = pictures[currentIndex];
+
+    this.setState({
+      lastIndex: currentIndex,
+    });
+
+    this._setImg(picture);
   }
 
   _setImg(src) {
@@ -52,30 +76,17 @@ class Picture extends React.Component {
     this._imgRef.current.src = src;
   }
 
-  _getRandomSource() {
-    const { lastIndex } = this.state;
-    const { pictures } = this.props;
-    let randomIndex;
-
-    while (randomIndex === undefined || randomIndex === lastIndex) {
-      randomIndex = Math.floor(Math.random() * pictures.length);
-    }
-
-    this.setState({
-      lastIndex: randomIndex,
-    });
-
-    return randomIndex;
-  }
-
   _onLoad() {
     const {
-      hasBlinking,
-      onResetBlinking,
+      index,
+      products,
+      blinkingIndex,
+      changeBlinkingProductIndex,
     } = this.props;
 
-    if (hasBlinking) {
-      onResetBlinking();
+    if (blinkingIndex === index) {
+      const updatedIndex = getRandomIndex(products, index);
+      this._timerId = setTimeout(() => changeBlinkingProductIndex(updatedIndex), 3000);
     }
 
     this.setState({
@@ -100,13 +111,24 @@ class Picture extends React.Component {
 }
 
 Picture.propTypes = {
+  index: PropTypes.number.isRequired,
   pictures: PropTypes.arrayOf(PropTypes.string),
-  hasBlinking: PropTypes.bool.isRequired,
-  onResetBlinking: PropTypes.func.isRequired,
+  products: PropTypes.arrayOf(PropTypes.shape(Product)),
+  blinkingIndex: PropTypes.number.isRequired,
+  changeBlinkingProductIndex: PropTypes.func.isRequired,
 };
 
 Picture.defaultProps = {
   pictures: [],
 };
 
-export default Picture;
+const mapStateToProps = (state, props) => ({
+  ...props,
+  blinkingIndex: getBlinkingIndex(state),
+});
+
+const mapDispatchToProps = dispatch => ({
+  changeBlinkingProductIndex: index => dispatch(BlinkingActionCreator.changeIndex(index)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Picture);
