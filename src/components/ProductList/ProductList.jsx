@@ -38,7 +38,7 @@ class ProductList extends React.Component {
         />
       ));
   }
-};
+}
 
 ProductList.propTypes = {
   isLoading: PropTypes.bool.isRequired,
@@ -48,7 +48,6 @@ ProductList.propTypes = {
 
 ProductList.defaultProps = {
   products: [],
-  favorites: [],
 };
 
 const mapStateToProps = (state, props) => ({

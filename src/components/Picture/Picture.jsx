@@ -120,6 +120,7 @@ Picture.propTypes = {
 
 Picture.defaultProps = {
   pictures: [],
+  products: [],
 };
 
 const mapStateToProps = (state, props) => ({

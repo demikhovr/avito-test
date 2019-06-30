@@ -8,9 +8,10 @@ import withCoordinates from '../../hocs/with-coordinates/with-coordinates';
 import Picture from '../Picture/Picture';
 
 import FavoritesOperation from '../../store/favorites/Operation/Operation';
+import { getFavorites } from '../../store/favorites/selectors';
+
 import { formatPrice } from '../../utils/util';
 import { Product } from '../../types';
-import { getFavorites } from '../../store/favorites/selectors';
 
 class ProductCard extends React.Component {
   constructor(props) {
@@ -31,14 +32,14 @@ class ProductCard extends React.Component {
 
   render() {
     const {
-      index,
       id,
-      products,
-      favorites,
-      addressString,
       pictures,
       price,
       title,
+      index,
+      products,
+      favorites,
+      addressString,
     } = this.props;
     const isFavorite = favorites.includes(id);
     const favoriteClass = isFavorite ? 'product-favorite--active' : '';
@@ -79,7 +80,7 @@ class ProductCard extends React.Component {
       </article>
     );
   }
-};
+}
 
 ProductCard.propTypes = {
   ...Product,
@@ -91,6 +92,8 @@ ProductCard.propTypes = {
 };
 
 ProductCard.defaultProps = {
+  products: [],
+  favorites: [],
   addressString: '',
 };
 
@@ -105,5 +108,5 @@ const mapDispatchToProps = dispatch => ({
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
-  withCoordinates
+  withCoordinates,
 )(ProductCard);
