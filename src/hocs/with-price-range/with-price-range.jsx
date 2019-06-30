@@ -17,11 +17,14 @@ const withPriceRange = (Component) => {
 
     /* eslint-disable react/no-did-update-set-state */
     componentDidUpdate(prevProps) {
-      const { price } = this.props;
+      const {
+        price,
+        currentValue,
+      } = this.props;
 
       if (prevProps.price.max !== price.max) {
         this.setState({
-          currentValue: price.max,
+          currentValue: currentValue || price.max,
         });
       }
     }
@@ -70,11 +73,16 @@ const withPriceRange = (Component) => {
   }
 
   WithPriceRange.propTypes = {
+    currentValue: PropTypes.number,
     price: PropTypes.shape({
       min: PropTypes.number,
       max: PropTypes.number,
     }).isRequired,
     onChange: PropTypes.func.isRequired,
+  };
+
+  WithPriceRange.defaultProps = {
+    currentValue: 0,
   };
 
   return WithPriceRange;

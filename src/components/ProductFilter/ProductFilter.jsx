@@ -13,6 +13,10 @@ import {
   getLoadingState,
   getPriceRange,
 } from '../../store/products/selectors';
+import {
+  Filter,
+  SortingType,
+} from '../../constants';
 
 const InputRangeWrapped = withPriceChange(InputRange);
 
@@ -36,12 +40,12 @@ class ProductFilter extends React.Component {
   render() {
     const {
       isLoading,
+      formData,
       priceRange,
       onChange,
     } = this.props;
 
     const disabled = isLoading ? 'disabled' : '';
-
     /* There's a bug with select and label */
     /* eslint-disable jsx-a11y/label-has-for */
     return (
@@ -59,6 +63,7 @@ class ProductFilter extends React.Component {
               name="is-favorite"
               id="favorite"
               onChange={onChange}
+              checked={formData[Filter.FAVORITES] || false}
             />
             <span className="radiogroup-item">Показывать избранные</span>
           </label>
@@ -76,6 +81,7 @@ class ProductFilter extends React.Component {
               name="category"
               id="category"
               onChange={onChange}
+              value={formData[Filter.CATEGORY]}
             >
               <option value="all">Все объявления</option>
               <option value="auto">Авто</option>
@@ -99,7 +105,7 @@ class ProductFilter extends React.Component {
               value="popular"
               id="sort-popular"
               onChange={onChange}
-              defaultChecked
+              checked={formData[Filter.SORT] === SortingType.POPULAR}
             />
             <span className="radiogroup-item">популярные</span>
           </label>
@@ -111,6 +117,7 @@ class ProductFilter extends React.Component {
               value="cheap-first"
               id="sort-cheap"
               onChange={onChange}
+              checked={formData[Filter.SORT] === SortingType.CHEAP_FIRST}
             />
             <span className="radiogroup-item">дешевые</span>
           </label>
@@ -122,6 +129,7 @@ class ProductFilter extends React.Component {
               value="expensive-first"
               id="sort-expensive"
               onChange={onChange}
+              checked={formData[Filter.SORT] === SortingType.EXPENSIVE_FIRST}
             />
             <span className="radiogroup-item">дорогие</span>
           </label>
@@ -138,6 +146,7 @@ class ProductFilter extends React.Component {
             className="price-change"
             price={priceRange}
             onChange={onChange}
+            currentValue={Number(formData[Filter.PRICE])}
           />
         </fieldset>
 
