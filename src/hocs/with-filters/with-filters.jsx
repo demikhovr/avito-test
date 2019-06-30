@@ -1,16 +1,22 @@
 import React from 'react';
 import _ from 'lodash';
 import { connect } from 'react-redux';
-import { getFilterType } from '../../store/filters/selectors';
+
+import { makeSortFunction } from '../../store/products/util';
 import { getFavorites } from '../../store/favorites/selectors';
+import { getFilters } from '../../store/filters/selectors';
+
+import {
+  Filter,
+  Category,
+} from '../../constants';
 
 const withFilters = (Component) => {
   class WithFilters extends React.Component {
-    shouldComponentUpdate(nextProps, nextState, nextContext) {
+    shouldComponentUpdate(nextProps) {
       const { props } = this;
 
       return !_.isEqual(props, nextProps);
-
     }
 
     render() {
@@ -18,13 +24,30 @@ const withFilters = (Component) => {
       const {
         products,
         favorites,
-        filterType,
+        filters,
       } = props;
-      let sortedProducts = [...products];
 
-      if (filterType === 'isFavorite') {
-        sortedProducts = products.filter((it) => favorites.includes(it.id))
-      }
+      const sortedProducts = [...products]
+        .filter((it) => {
+          let isFavorite = true;
+          let isFilteredByPrice = true;
+          let isFilteredByCategory = true;
+
+          if (filters[Filter.FAVORITES]) {
+            isFavorite = favorites.includes(it.id);
+          }
+
+          if (filters[Filter.CATEGORY] && Category[filters[Filter.CATEGORY].toUpperCase()]) {
+            isFilteredByCategory = it.category === filters[Filter.CATEGORY];
+          }
+
+          if (filters[Filter.PRICE]) {
+            isFilteredByPrice = it.price <= Number(filters[Filter.PRICE]);
+          }
+
+          return isFavorite && isFilteredByPrice && isFilteredByCategory;
+        })
+        .sort(makeSortFunction(filters.sort));
 
       return (
         <Component
@@ -38,7 +61,7 @@ const withFilters = (Component) => {
   const mapStateToProps = (state, props) => ({
     ...props,
     favorites: getFavorites(state),
-    filterType: getFilterType(state),
+    filters: getFilters(state),
   });
 
 

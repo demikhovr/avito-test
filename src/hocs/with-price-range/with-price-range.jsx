@@ -25,7 +25,7 @@ const withPriceRange = (Component) => {
         });
       }
     }
-    /* eslint-disable react/no-did-update-set-state */
+    /* eslint-enable react/no-did-update-set-state */
 
     _onChange(evt) {
       evt.persist();

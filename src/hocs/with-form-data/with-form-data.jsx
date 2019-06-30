@@ -13,7 +13,6 @@ const withFormData = (Component) => {
     }
 
     _onChange(evt) {
-      evt.persist();
       const {
         name,
         type,
@@ -24,7 +23,7 @@ const withFormData = (Component) => {
       this.setState(prevState => ({
         formData: {
           ...prevState.formData,
-          [name]: type === 'checkbox' || type === 'radio' ? checked : value,
+          [name]: type === 'checkbox' ? checked : value,
         },
       }));
     }
@@ -36,8 +35,8 @@ const withFormData = (Component) => {
       return (
         <Component
           {...props}
-          onChange={this._onChange}
           formData={formData}
+          onChange={this._onChange}
         />
       );
     }

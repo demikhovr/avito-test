@@ -1,11 +1,11 @@
 import React from 'react';
 import axios from 'axios';
 
-import { Product } from '../../types';
 import {
   GEOCODE_URL,
   GEOCODE_API_KEY,
 } from '../../constants';
+import { Product } from '../../types';
 
 const withCoordinates = (Component) => {
   class WithCoordinates extends React.Component {
