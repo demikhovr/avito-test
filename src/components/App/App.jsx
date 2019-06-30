@@ -1,44 +1,33 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { compose } from 'recompose';
-
-import withBlinkedPicture from '../../hocs/with-blinked-picture/with-blinked-picture';
 
 import ProductList from '../ProductList/ProductList';
 import ProductFilter from '../ProductFilter/ProductFilter';
 
-import { getProducts } from '../../store/products/selectors';
 import ProductsOperation from '../../store/products/Operation/Operation';
-import { Product } from '../../types';
+import FavoritesOperation from '../../store/favorites/Operation/Operation';
 
 class App extends React.Component {
   componentDidMount() {
-    const { loadProducts } = this.props;
+    const {
+      loadProducts,
+      loadFavorites,
+    } = this.props;
+
     loadProducts();
+    loadFavorites();
   }
 
   render() {
-    const {
-      products,
-      blinkedPicture,
-      onResetBlinking,
-    } = this.props;
-
     return (
       <React.Fragment>
         <main className="layout centered">
           <section className="layout-main products-list">
-            <ProductList
-              products={products}
-              blinkedPicture={blinkedPicture}
-              onResetBlinking={onResetBlinking}
-            />
+            <ProductList />
           </section>
           <aside className="layout-sidebar">
-            <ProductFilter
-              onResetBlinking={onResetBlinking}
-            />
+            <ProductFilter />
           </aside>
         </main>
       </React.Fragment>
@@ -47,26 +36,13 @@ class App extends React.Component {
 }
 
 App.propTypes = {
-  products: PropTypes.arrayOf(PropTypes.shape(Product)),
   loadProducts: PropTypes.func.isRequired,
-  blinkedPicture: PropTypes.number.isRequired,
-  onResetBlinking: PropTypes.func.isRequired,
+  loadFavorites: PropTypes.func.isRequired,
 };
-
-App.defaultProps = {
-  products: [],
-};
-
-const mapStateToProps = (state, props) => ({
-  ...props,
-  products: getProducts(state),
-});
 
 const mapDispatchToProps = dispatch => ({
   loadProducts: () => dispatch(ProductsOperation.loadProducts()),
+  loadFavorites: () => dispatch(FavoritesOperation.loadFavorites()),
 });
 
-export default compose(
-  connect(mapStateToProps, mapDispatchToProps),
-  withBlinkedPicture,
-)(App);
+export default connect(null, mapDispatchToProps)(App);
