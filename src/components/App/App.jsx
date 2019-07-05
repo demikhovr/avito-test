@@ -1,6 +1,6 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 import ProductList from '../ProductList/ProductList';
 import ProductFilter from '../ProductFilter/ProductFilter';
@@ -8,31 +8,26 @@ import ProductFilter from '../ProductFilter/ProductFilter';
 import ProductsOperation from '../../store/products/Operation/Operation';
 import FavoritesOperation from '../../store/favorites/Operation/Operation';
 
-class App extends React.Component {
-  componentDidMount() {
-    const {
-      loadProducts,
-      loadFavorites,
-    } = this.props;
+const App = (props) => {
+  const { loadProducts, loadFavorites } = props;
 
+  useEffect(() => {
     loadProducts();
     loadFavorites();
-  }
+  }, [])
 
-  render() {
-    return (
-      <React.Fragment>
-        <main className="layout centered">
-          <section className="layout-main products-list">
-            <ProductList />
-          </section>
-          <aside className="layout-sidebar">
-            <ProductFilter />
-          </aside>
-        </main>
-      </React.Fragment>
-    );
-  }
+  return (
+    <React.Fragment>
+      <main className="layout centered">
+        <section className="layout-main products-list">
+          <ProductList />
+        </section>
+        <aside className="layout-sidebar">
+          <ProductFilter />
+        </aside>
+      </main>
+    </React.Fragment>
+  );
 }
 
 App.propTypes = {

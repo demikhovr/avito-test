@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { compose } from 'recompose';
@@ -15,29 +15,27 @@ import BlinkingActionCreator from '../../store/blinking/ActionCreator/ActionCrea
 import { Product } from '../../types';
 import { INITIAL_PIC_INDEX } from '../../constants';
 
-class ProductList extends React.Component {
-  componentDidUpdate() {
-    const { changeBlinkingProductIndex } = this.props;
+const ProductList = (props) => {
+  const {
+    isLoading,
+    products,
+    changeBlinkingProductIndex,
+  } = props;
+
+  useEffect(() => {
     changeBlinkingProductIndex(INITIAL_PIC_INDEX);
-  }
+  }, []);
 
-  render() {
-    const {
-      isLoading,
-      products,
-    } = this.props;
-
-    return isLoading
-      ? <div>Loading</div>
-      : products.map((it, index) => (
-        <ProductCard
-          key={it.id}
-          {...it}
-          index={index}
-          products={products}
-        />
-      ));
-  }
+  return isLoading
+    ? <div>Loading</div>
+    : products.map((it, index) => (
+      <ProductCard
+        key={it.id}
+        {...it}
+        index={index}
+        products={products}
+      />
+    ));
 }
 
 ProductList.propTypes = {
