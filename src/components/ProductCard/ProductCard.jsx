@@ -32,7 +32,7 @@ const ProductCard = (props) => {
         <NavLink
           className="product-pic-number"
           to={{
-            pathname: `details/${id}`,
+            pathname: `/details/${id}`,
             search: window.location.search,
           }}
         >
@@ -54,7 +54,7 @@ const ProductCard = (props) => {
         </button>
         <h3 className="product-title">
           <NavLink to={{
-            pathname: `details/${id}`,
+            pathname: `/details/${id}`,
             search: window.location.search,
           }}
           >

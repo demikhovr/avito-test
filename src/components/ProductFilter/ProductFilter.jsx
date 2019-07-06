@@ -129,7 +129,7 @@ const ProductFilter = (props) => {
           className="price-change"
           price={priceRange}
           onChange={onChange}
-          currentValue={Number(formData[Filter.PRICE])}
+          currentValue={Number(formData[Filter.PRICE] ? formData[Filter.PRICE] : 0)}
         />
       </fieldset>
 
