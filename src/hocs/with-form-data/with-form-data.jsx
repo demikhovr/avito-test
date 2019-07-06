@@ -43,7 +43,7 @@ const withFormData = (Component) => {
       };
 
       setFormData(newFormData);
-      history.push({
+      history.replace({
         search: `?${new URLSearchParams(newFormData).toString()}`,
       });
     }, [formData]);

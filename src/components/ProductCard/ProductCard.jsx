@@ -1,9 +1,7 @@
 import React, { useCallback } from 'react';
+import { NavLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { compose } from 'recompose';
-
-import withCoordinates from '../../hocs/with-coordinates/with-coordinates';
 
 import Picture from '../Picture/Picture';
 
@@ -22,7 +20,6 @@ const ProductCard = (props) => {
     index,
     products,
     favorites,
-    addressString,
     onChangeFavorite,
   } = props;
   const isFavorite = favorites.includes(id);
@@ -32,9 +29,15 @@ const ProductCard = (props) => {
   return (
     <article className="products-list-item product">
       <div className="product-pic">
-        <a href="#1" className="product-pic-number">
+        <NavLink
+          className="product-pic-number"
+          to={{
+            pathname: `details/${id}`,
+            search: window.location.search,
+          }}
+        >
           {pictures.length}
-        </a>
+        </NavLink>
         <Picture
           index={index}
           pictures={pictures}
@@ -50,15 +53,16 @@ const ProductCard = (props) => {
           Добавить в избранное
         </button>
         <h3 className="product-title">
-          <a href="#1">
+          <NavLink to={{
+            pathname: `details/${id}`,
+            search: window.location.search,
+          }}
+          >
             {title}
-          </a>
+          </NavLink>
         </h3>
         <p className="product-price">
           {price ? `${formatPrice(price)}₽` : null}
-        </p>
-        <p className="product-address">
-          {addressString}
         </p>
         <p className="product-date" />
       </div>
@@ -71,14 +75,12 @@ ProductCard.propTypes = {
   index: PropTypes.number.isRequired,
   products: PropTypes.arrayOf(PropTypes.shape(Product)),
   favorites: PropTypes.arrayOf(PropTypes.string),
-  addressString: PropTypes.string,
   onChangeFavorite: PropTypes.func.isRequired,
 };
 
 ProductCard.defaultProps = {
   products: [],
   favorites: [],
-  addressString: '',
 };
 
 const mapStateToProps = (state, props) => ({
@@ -90,7 +92,4 @@ const mapDispatchToProps = dispatch => ({
   onChangeFavorite: id => dispatch(FavoritesOperation.changeFavorite(id)),
 });
 
-export default compose(
-  connect(mapStateToProps, mapDispatchToProps),
-  withCoordinates,
-)(ProductCard);
+export default connect(mapStateToProps, mapDispatchToProps)(ProductCard);

@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import {
-  GEOCODE_URL,
-  GEOCODE_API_KEY,
-} from '../../constants';
+import { GEOCODE_URL } from '../../constants';
 import { Product } from '../../types';
 
 const withCoordinates = (Component) => {
@@ -16,7 +13,7 @@ const withCoordinates = (Component) => {
       if (!isMounted.current) {
         (async () => {
           try {
-            const { data } = await axios.get(`${GEOCODE_URL}&apikey=${GEOCODE_API_KEY}&geocode=${lng},${lat}`);
+            const { data } = await axios.get(`${GEOCODE_URL}&lon=${lng}&lat=${lat}`);
             const { GeoObject } = data.response.GeoObjectCollection.featureMember[0];
             setAddressString(`${GeoObject.description}, ${GeoObject.name}`);
           } catch (err) {

@@ -26,17 +26,17 @@ const ProductList = (props) => {
     changeBlinkingProductIndex(INITIAL_PIC_INDEX);
   }, []);
 
-  return isLoading
-    ? <div>Loading</div>
-    : products.map((it, index) => (
-      <ProductCard
-        key={it.id}
-        {...it}
-        index={index}
-        products={products}
-      />
-    ));
-}
+  const list = !products.length ? 'Список пуст' : (products.map((it, index) => (
+    <ProductCard
+      key={it.id}
+      {...it}
+      index={index}
+      products={products}
+    />
+  )));
+
+  return isLoading ? <div>Loading</div> : list;
+};
 
 ProductList.propTypes = {
   isLoading: PropTypes.bool.isRequired,

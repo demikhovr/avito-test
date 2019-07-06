@@ -1,52 +1,130 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
+import { NavLink } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import ReactRouterPropTypes from 'react-router-prop-types';
+import { connect } from 'react-redux';
 
-const Details = () => (
-  <div className="overlay">
-    <article className="details">
-      <button className="details-close" type="button">Закрыть</button>
+import { formatPrice } from '../../utils/util';
+import DetailsOperation from '../../store/details/Operation/Operation';
+import { getDetails, getLoadingState } from '../../store/details/selectors';
+import { Product } from '../../types';
+import Seller from '../Seller/Seller';
+import { GEOCODE_URL } from '../../constants';
 
-      <h2 className="details-title">Квартира на Невском</h2>
+const Details = (props) => {
+  const {
+    details,
+    isLoading,
+    loadDetails,
+  } = props;
 
-      <section className="details-main">
-        <p className="details-date">три дня назад</p>
-        <p className="details-price">8&thinsp;000&thinsp;000&nbsp;₽</p>
+  const [addressString, setAddressString] = useState(null);
+  const isMounted = useRef(false);
 
-        <section className="details-gallery">
-          <img src="" alt="" className="details-gallery-preview" />
-          <div className="details-gallery-thumbnails">
-            <img src="" alt="" className="details-gallery-item" />
-            <img src="" alt="" className="details-gallery-item" />
-            <img src="" alt="" className="details-gallery-item" />
-            <img src="" alt="" className="details-gallery-item" />
-          </div>
-        </section>
+  useEffect(() => {
+    loadDetails(props.match.params.id);
+  }, []);
 
-        <p className="details-description">
-          Просторная трехкомнатная квартира. Окна на восток. 15 минут пешком до метро.
-          В собственности более трех лет. Согласованная перепланировка. Подходит под ипотеку
-        </p>
-      </section>
+  useEffect(() => {
+    if (!isMounted.current && details) {
+      (async () => {
+        try {
+          const { data } = await axios.get(`${GEOCODE_URL}&lon=${details.address.lng}&lat=${details.address.lat}`);
+          setAddressString(data.display_name);
+        } catch (err) {
+          console.log(err);
+        }
+      })();
+    }
 
-      <aside className="details-aside">
-        <section className="details-address">
-          <p className="details-address-text">м.&nbsp;Купчино, улица Лётчика Иванова, 3</p>
-          <div className="details-address-map" />
-        </section>
+    isMounted.current = true;
 
-        <section className="details-seller">
-          <a href="#1" className="details-seller-link">
-            <h3 className="details-seller-name">Агентство недвижимости «Купчино»</h3>
-          </a>
+    return () => {
+      isMounted.current = false;
+    };
+  }, [details]);
 
-          <p className="details-seller-rating details-seller-rating-good">
-            рейтинг
-            <span className="details-seller-rating-val">4.3</span>
-            <a href="#1">Отзывы</a>
-          </p>
-        </section>
-      </aside>
-    </article>
-  </div>
-);
+  return (
+    <div className="overlay">
+      <article className="details">
+        {isLoading || !details
+          ? 'Loading'
+          : (
+            <>
+              <NavLink
+                className="details-close"
+                to={{
+                  pathname: '/',
+                  search: window.location.search,
+                }}
+              >
+                Закрыть
+              </NavLink>
+              <h2 className="details-title">
+                {details.title}
+              </h2>
+              <section className="details-main">
+                {/* <p className="details-date">три дня назад</p> */}
+                <p className="details-price">
+                  {details.price ? `${formatPrice(details.price)}₽` : null}
+                </p>
+                <section className="details-gallery">
+                  <img src={details.pictures[0]} alt="" className="details-gallery-preview" />
+                  <div className="details-gallery-thumbnails">
+                    {details.pictures.slice(1).map((it, i) => {
+                      const key = it + i;
 
-export default Details;
+                      return (
+                        <img
+                          key={key}
+                          src={it}
+                          alt=""
+                          className="details-gallery-item"
+                        />
+                      );
+                    })}
+                  </div>
+                </section>
+                <p className="details-description">
+                  {details.description}
+                </p>
+              </section>
+              <aside className="details-aside">
+                <section className="details-address">
+                  <p className="details-address-text">
+                    {addressString}
+                  </p>
+                  <div className="details-address-map" />
+                </section>
+                <Seller id={details.relationships.seller} />
+              </aside>
+            </>
+          )}
+      </article>
+    </div>
+  );
+};
+
+Details.propTypes = {
+  match: ReactRouterPropTypes.match.isRequired,
+  details: PropTypes.shape(Product),
+  isLoading: PropTypes.bool.isRequired,
+  loadDetails: PropTypes.func.isRequired,
+};
+
+Details.defaultProps = {
+  details: {},
+};
+
+const mapStateToProps = (state, props) => ({
+  ...props,
+  isLoading: getLoadingState(state),
+  details: getDetails(state),
+});
+
+const mapDispatchToProps = dispatch => ({
+  loadDetails: id => dispatch(DetailsOperation.loadDetails(id)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Details);

@@ -3,8 +3,7 @@ export const PRICE_LOCALE = 'ru-RU';
 export const CHANGE_PIC_DELAY = 3000;
 export const INITIAL_PIC_INDEX = 0;
 export const PRICE_RANGE_RATE = 500;
-export const GEOCODE_URL = 'https://geocode-maps.yandex.ru/1.x/?format=json';
-export const GEOCODE_API_KEY = '6390cdfa-6556-43cb-a186-d1046ce806db';
+export const GEOCODE_URL = 'https://eu1.locationiq.com/v1/reverse.php?key=0ff67734c811f8&format=json';
 export const Filter = {
   FAVORITES: 'is-favorite',
   CATEGORY: 'category',
