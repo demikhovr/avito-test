@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-
 import {
   GEOCODE_URL,
   GEOCODE_API_KEY,
@@ -8,52 +7,38 @@ import {
 import { Product } from '../../types';
 
 const withCoordinates = (Component) => {
-  class WithCoordinates extends React.Component {
-    constructor(props) {
-      super(props);
+  const WithCoordinates = (props) => {
+    const [addressString, setAddressString] = useState(null);
+    const isMounted = useRef(false);
+    const { address: { lat, lng } } = props;
 
-      this.state = {
-        addressString: null,
-      };
-
-      this._mounted = true;
-    }
-
-    componentDidMount() {
-      const { address: { lat, lng } } = this.props;
-
-      axios.get(`${GEOCODE_URL}&apikey=${GEOCODE_API_KEY}&geocode=${lng},${lat}`)
-        .then((response) => {
-          if (!this._mounted) {
-            return;
+    useEffect(() => {
+      if (!isMounted.current) {
+        (async () => {
+          try {
+            const { data } = await axios.get(`${GEOCODE_URL}&apikey=${GEOCODE_API_KEY}&geocode=${lng},${lat}`);
+            const { GeoObject } = data.response.GeoObjectCollection.featureMember[0];
+            setAddressString(`${GeoObject.description}, ${GeoObject.name}`);
+          } catch (err) {
+            console.log(err);
           }
+        })();
+      }
 
-          const { data } = response;
-          const { GeoObject } = data.response.GeoObjectCollection.featureMember[0];
+      isMounted.current = true;
 
-          this.setState({
-            addressString: `${GeoObject.description}, ${GeoObject.name}`,
-          });
-        })
-        .catch(() => {});
-    }
+      return () => {
+        isMounted.current = false;
+      };
+    }, []);
 
-    componentWillUnmount() {
-      this._mounted = false;
-    }
-
-    render() {
-      const { addressString } = this.state;
-      const { props } = this;
-
-      return (
-        <Component
-          {...props}
-          addressString={addressString}
-        />
-      );
-    }
-  }
+    return (
+      <Component
+        {...props}
+        addressString={addressString}
+      />
+    );
+  };
 
 
   WithCoordinates.propTypes = Product;

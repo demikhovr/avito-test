@@ -1,5 +1,5 @@
 import React from 'react';
-import _ from 'lodash';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { makeSortFunction } from '../../store/products/util';
@@ -10,53 +10,62 @@ import {
   Filter,
   Category,
 } from '../../constants';
+import { Product } from '../../types';
 
 const withFilters = (Component) => {
-  class WithFilters extends React.Component {
-    shouldComponentUpdate(nextProps) {
-      const { props } = this;
+  const WithFilters = (props) => {
+    const {
+      products,
+      favorites,
+      filters,
+    } = props;
 
-      return !_.isEqual(props, nextProps);
-    }
+    const sortedProducts = [...products]
+      .filter((it) => {
+        let isFavorite = true;
+        let isFilteredByPrice = true;
+        let isFilteredByCategory = true;
 
-    render() {
-      const { props } = this;
-      const {
-        products,
-        favorites,
-        filters,
-      } = props;
+        if (filters[Filter.FAVORITES]) {
+          isFavorite = favorites.includes(it.id);
+        }
 
-      const sortedProducts = [...products]
-        .filter((it) => {
-          let isFavorite = true;
-          let isFilteredByPrice = true;
-          let isFilteredByCategory = true;
+        if (filters[Filter.CATEGORY] && Category[filters[Filter.CATEGORY].toUpperCase()]) {
+          isFilteredByCategory = it.category === filters[Filter.CATEGORY];
+        }
 
-          if (filters[Filter.FAVORITES]) {
-            isFavorite = favorites.includes(it.id);
-          }
+        if (filters[Filter.PRICE]) {
+          isFilteredByPrice = it.price <= Number(filters[Filter.PRICE]);
+        }
 
-          if (filters[Filter.CATEGORY] && Category[filters[Filter.CATEGORY].toUpperCase()]) {
-            isFilteredByCategory = it.category === filters[Filter.CATEGORY];
-          }
+        return isFavorite && isFilteredByPrice && isFilteredByCategory;
+      })
+      .sort(makeSortFunction(filters.sort));
 
-          if (filters[Filter.PRICE]) {
-            isFilteredByPrice = it.price <= Number(filters[Filter.PRICE]);
-          }
+    return (
+      <Component
+        {...props}
+        products={sortedProducts}
+      />
+    );
+  };
 
-          return isFavorite && isFilteredByPrice && isFilteredByCategory;
-        })
-        .sort(makeSortFunction(filters.sort));
+  WithFilters.propTypes = {
+    products: PropTypes.arrayOf(PropTypes.shape(Product)),
+    favorites: PropTypes.arrayOf(PropTypes.string.isRequired),
+    filters: PropTypes.shape({
+      category: PropTypes.string,
+      'is-favorite': PropTypes.bool,
+      'price-change': PropTypes.string,
+      sort: PropTypes.string,
+    }),
+  };
 
-      return (
-        <Component
-          {...props}
-          products={sortedProducts}
-        />
-      );
-    }
-  }
+  WithFilters.defaultProps = {
+    products: [],
+    favorites: [],
+    filters: {},
+  };
 
   const mapStateToProps = (state, props) => ({
     ...props,

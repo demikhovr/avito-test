@@ -1,76 +1,57 @@
-import React from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+} from 'react';
 import PropTypes from 'prop-types';
 
 import { PRICE_RANGE_RATE } from '../../constants';
 
 const withPriceRange = (Component) => {
-  class WithPriceRange extends React.Component {
-    constructor(props) {
-      super(props);
+  const WithPriceRange = (props) => {
+    const {
+      price,
+      onChange,
+    } = props;
+    const [currentValue, setCurrentValue] = useState(0);
+    const prevValue = useRef();
 
-      this.state = {
-        currentValue: 0,
-      };
-
-      this._onChange = this._onChange.bind(this);
-    }
-
-    /* eslint-disable react/no-did-update-set-state */
-    componentDidUpdate(prevProps) {
-      const {
-        price,
-        currentValue,
-      } = this.props;
-
-      if (prevProps.price.max !== price.max) {
-        this.setState({
-          currentValue: currentValue || price.max,
-        });
+    useEffect(() => {
+      if (prevValue.current !== price.max) {
+        setCurrentValue(currentValue || price.max);
       }
-    }
-    /* eslint-enable react/no-did-update-set-state */
 
-    _onChange(evt) {
+      prevValue.current = price.max;
+    }, [price]);
+
+    const _onChange = useCallback((evt) => {
       evt.persist();
-      const {
-        price,
-        onChange,
-      } = this.props;
       const value = Number(evt.target.value);
 
       if (value === price.min || value === price.max) {
-        this.setState({
-          currentValue: value,
-        }, () => onChange(evt));
-
+        setCurrentValue(value);
+        onChange(evt);
         return;
       }
 
       const diff = value % PRICE_RANGE_RATE;
-      const currentValue = value - diff;
 
       if (currentValue >= price.min && currentValue <= price.max) {
-        this.setState({
-          currentValue,
-        }, () => onChange(evt));
+        setCurrentValue(value - diff);
+        onChange(evt);
       }
-    }
+    }, [currentValue, price]);
 
-    render() {
-      const { currentValue } = this.state;
-      const { props } = this;
-      const { price } = props;
-
-      return (
-        <Component
-          {...props}
-          value={price}
-          currentValue={currentValue}
-          onChange={this._onChange}
-        />
-      );
-    }
-  }
+    return (
+      <Component
+        {...props}
+        value={price}
+        currentValue={currentValue}
+        onChange={_onChange}
+      />
+    );
+  };
 
   WithPriceRange.propTypes = {
     currentValue: PropTypes.number,

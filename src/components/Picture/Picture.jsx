@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Product } from '../../types';
+
 import BlinkingActionCreator from '../../store/blinking/ActionCreator/ActionCreator';
 import { getBlinkingIndex } from '../../store/blinking/selectors';
 import { getRandomIndex } from '../../utils/util';
+import { Product } from '../../types';
 
 class Picture extends React.Component {
   constructor(props) {
@@ -17,16 +18,13 @@ class Picture extends React.Component {
 
     this._timerId = null;
     this._imgRef = React.createRef();
-
-    this._setImg = this._setImg.bind(this);
-    this._onLoad = this._onLoad.bind(this);
   }
 
   componentDidMount() {
     const { lastIndex } = this.state;
     const { pictures } = this.props;
     const picture = pictures[lastIndex];
-    this._setImg(picture);
+    this.setImg(picture);
   }
 
   componentDidUpdate(prevProps) {
@@ -47,7 +45,7 @@ class Picture extends React.Component {
       return;
     }
 
-    this._updateImg();
+    this.updateImg();
   }
 
   componentWillUnmount() {
@@ -55,7 +53,7 @@ class Picture extends React.Component {
     clearTimeout(this._timerId);
   }
 
-  _updateImg() {
+  updateImg = () => {
     const { lastIndex } = this.state;
     const { pictures } = this.props;
     const currentIndex = getRandomIndex(pictures, lastIndex);
@@ -65,10 +63,10 @@ class Picture extends React.Component {
       lastIndex: currentIndex,
     });
 
-    this._setImg(picture);
+    this.setImg(picture);
   }
 
-  _setImg(src) {
+  setImg = (src) => {
     this.setState({
       isLoading: true,
     });
@@ -76,7 +74,7 @@ class Picture extends React.Component {
     this._imgRef.current.src = src;
   }
 
-  _onLoad() {
+  onLoad = () => {
     const {
       index,
       products,
@@ -104,7 +102,7 @@ class Picture extends React.Component {
         width="120"
         alt=""
         ref={this._imgRef}
-        onLoad={this._onLoad}
+        onLoad={this.onLoad}
       />
     );
   }
